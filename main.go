@@ -31,6 +31,7 @@ func main() {
 
 	router.HandleFunc("/api/v1/products", controllers.GetProducts).Methods("GET")
 	router.HandleFunc("/api/v1/product", controllers.CreateProduct).Methods("POST")
+	router.HandleFunc("/api/v1/product/{id}", controllers.GetProduct).Methods("GET")
 	router.HandleFunc("/api/v1/product/{id}", controllers.UpdateProduct).Methods("PUT")
 	router.HandleFunc("/api/v1/product/{id}", controllers.DeleteProduct).Methods("DELETE")
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)

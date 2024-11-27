@@ -66,22 +66,7 @@ func GetProducts(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Exclude song with "deleted_at"
-	//models.DB.Where("deleted_at IS NULL").Find(&products)
-
-	//models.DB.Where("deleted_at IS NOT NULL").Find(&products)
-	//models.DB.Where()
-
-	// Add a pagination
-	//models.DB.Scopes(helper.Paginate(r)).Find(&products)
-	//models.DB.Scopes(helper.Paginate(r)).Find(&products)
-
 	db.Scopes(helper.Paginate(r)).Find(&products)
-	//fmt.Println(models.DB.Where())
-
-	//models.DB.Debug()
-
-	//models.DB.Find(&products)
 
 	res, err := json.Marshal(products)
 	if err != nil {
@@ -114,7 +99,7 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	// Send song's data in response
+	// Send product's data in response
 	res, err := json.Marshal(product)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -126,11 +111,17 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeleteProduct godoc
+// @Summary Delete a product by id
+// @Param id path integer true "Product ID"
+// @Success 200
+// @Failure 400
+// @Router /product/{id} [DELETE]
 func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	log.Println(params["id"])
 	var product models.Product
-	// Receiving song's id
+	// Receiving product's id
 	id, ok := params["id"]
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
@@ -148,6 +139,16 @@ func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UpdateProduct godoc
+// @Summary Updates product based on given ID
+// @Produce json
+// @Accept json
+// @Param id path integer true "Product ID"
+// @Param body body models.Product true "body"
+// @Success 200
+// @Failure 400
+// @Failure 404
+// @Router /product/{id} [PUT]
 func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	log.Println(params["id"])
@@ -176,6 +177,41 @@ func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 			// Если не было ошибки обновим товар
 			models.DB.Model(&product).Updates(productData)
 			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
+
+// GetProduct godoc
+// @Summary Retrieves product based on given ID
+// @Produce json
+// @Param id path integer true "Product ID"
+// @Success 200
+// @Failure 400
+// @Failure 500
+// @Router /product/{id} [GET]
+func GetProduct(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	log.Println(params["id"])
+	var product models.Product
+	// Receiving product's id
+	id, ok := params["id"]
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	// Находим товар
+	db := models.DB.Where("id=?", id).Find(&product)
+
+	if db.RecordNotFound() {
+		w.WriteHeader(http.StatusNotFound)
+	} else {
+		log.Printf("Product with id=%s was found", id)
+		res, err := json.Marshal(product)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		} else {
+			w.WriteHeader(http.StatusOK)
+			_, err = w.Write(res)
 		}
 	}
 }
