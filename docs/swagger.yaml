@@ -1,0 +1,93 @@
+basePath: /api/v1
+definitions:
+  models.Product:
+    properties:
+      CurrentPrice:
+        description: |-
+          CurrentPrice float32 `json:"CurrentPrice" example:"10.01" sql:"type:decimal(10,2);"`
+          RegularPrice float32 `json:"RegularPrice" example:"10.01" sql:"type:decimal(10,2);"`
+          CreatedAt    time.Time `json:"CreatedAt" example:"2006-02-01T15:04:05Z" gorm:"default:current_timestamp"`
+          UpdatedAt    time.Time `json:"UpdatedAt" example:"2006-02-01T15:04:05Z" gorm:"default:current_timestamp"`
+        example: 10.01
+        type: number
+      Description:
+        example: Product description
+        type: string
+      Image:
+        description: |-
+          CreatedAt    time.Time `gorm:"autoCreateTime:true" json:"createdAt"`
+          UpdatedAt    time.Time `gorm:"autoUpdateTime:true" json:"updatedAt"`
+        example: Product Image
+        type: string
+      RegularPrice:
+        example: 10.01
+        type: number
+      Sku:
+        example: Product sku
+        type: string
+      Title:
+        example: Product title
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+info:
+  contact:
+    email: ladovod@gmail.com
+    name: Dmitrii
+  description: Swagger API for Songs library API.
+  termsOfService: http://swagger.io/terms/
+  title: Products API
+  version: "1.0"
+paths:
+  /product:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "500":
+          description: Internal Server Error
+      summary: Create a product
+  /products:
+    get:
+      parameters:
+      - description: paginating results - ?page=1
+        in: query
+        name: page
+        type: string
+      - description: product search - ?title=Some title
+        in: query
+        name: title
+        type: string
+      - description: product search - ?description=Some descr
+        in: query
+        name: description
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "500":
+          description: Internal Server Error
+      summary: Retrieves products
+swagger: "2.0"
