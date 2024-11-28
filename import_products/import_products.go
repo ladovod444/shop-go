@@ -8,6 +8,7 @@ import (
 	gormbulk "github.com/t-tiger/gorm-bulk-insert/v2"
 	"io"
 	"log"
+	"math/rand/v2"
 	"net/http"
 	"os"
 	"shop/helper"
@@ -99,16 +100,21 @@ func processImport(count int) {
 		//fmt.Println(product)
 		fmt.Println(pcount, product.Sku, product.Title, product.Price.RegularPrice, product.DisplayAssets[0].Url, product.Description)
 
+		// Получим рандомную категорию
+		categories := getCategories(db)
+		num := rand.IntN(len(categories))
+		category := categories[num]
+
 		insertRecords = append(insertRecords,
 			models.Product{
 				Title:        product.Title,
 				Sku:          product.Sku,
 				CurrentPrice: float32(product.Price.RegularPrice),
 				RegularPrice: float32(product.Price.FinalPrice),
-				//CreatedAt:    time.Time{},
-				//UpdatedAt:    time.Time{},
-				Image:       product.DisplayAssets[0].Url,
-				Description: product.Description,
+				Image:        product.DisplayAssets[0].Url,
+				Description:  product.Description,
+				// Зададим рандомную категорию
+				CategoryId: category.ID,
 			},
 		)
 
@@ -155,4 +161,11 @@ func request(url, api_key string) ([]byte, error) {
 	}
 
 	return result, nil
+}
+
+func getCategories(db *gorm.DB) []models.Category {
+	var categories []models.Category
+	db.Find(&categories)
+
+	return categories
 }

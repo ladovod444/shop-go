@@ -2,37 +2,15 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
 	_ "github.com/swaggo/http-swagger"
 	"io"
 	"log"
 	"net/http"
 	"shop/helper"
 	"shop/models"
-	"strconv"
 )
-
-func Paginate(r *http.Request) func(db *gorm.DB) *gorm.DB {
-	return func(db *gorm.DB) *gorm.DB {
-		q := r.URL.Query()
-		pageNum, err := strconv.Atoi(q.Get("page"))
-		if err == nil {
-			pageSize, _ := strconv.Atoi(q.Get("items_per_page"))
-			switch {
-			case pageSize > 100:
-				pageSize = 100
-			case pageSize <= 0:
-				pageSize = 5
-			}
-
-			offset := (pageNum - 1) * pageSize
-			return db.Offset(offset).Limit(pageSize)
-		}
-
-		return db
-	}
-}
 
 // GetProducts godoc
 // @Summary Retrieves products
@@ -94,6 +72,8 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error on data: ", err.Error())
 	}
+
+	fmt.Println(product)
 
 	models.DB.Create(&product)
 
