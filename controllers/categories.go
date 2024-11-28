@@ -10,7 +10,7 @@ import (
 )
 
 // CreateCategory godoc
-// @Summary Create a product
+// @Summary Create a category
 // @Produce json
 // @Accept json
 // @Param body body models.Category true "body"
